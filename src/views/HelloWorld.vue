@@ -1,16 +1,18 @@
 <template>
   <div class="hello">
-    11
+    <simpleCalendar ref="simpleCalendar"></simpleCalendar>
   </div>
 </template>
 
 <script>
+import simpleCalendar from '@/plugins/simpleCalendar/src/simpleCalendar'
 export default {
   name: 'HelloWorld',
+  components: {
+    simpleCalendar
+  },
   data () {
-    return {
-      msg: 'Welcome to Your Vue.js App'
-    }
+    return {}
   }
 }
 </script>

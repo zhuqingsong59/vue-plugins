@@ -1,9 +1,9 @@
 <template>
   <div class="simpleCalendar">
     <div class="header">
-      <el-button @click="pre" :disabled="monthPage < 0">上一月</el-button>
+      <button class="switchButton" @click="pre" :disabled="monthPage < 0">上一月</button>
       <p>{{yearMonth}}</p>
-      <el-button @click="next" :disabled="monthPage > 0">下一月</el-button>
+      <button class="switchButton" @click="next" :disabled="monthPage > 0">下一月</button>
     </div>
     <div class="content">
       <ul class="week">
@@ -100,39 +100,49 @@ export default {
     background-color: #ffffff;
     border-radius: 4px;
     border: solid 1px #e9e9e9;
+    box-sizing: border-box;
     .header {
-      widows: 100%;
+      width: 100%;
       height: 50px;
       position: relative;
+      box-sizing: border-box;
       border-bottom: 1px solid #e9e9e9;
       p{
+        margin: 0;
         height: 50px;
-        line-height: 50px;
-        text-align: center;
         color: #535353;
         font-size: 14px;
         font-weight: 500;
+        line-height: 50px;
+        text-align: center;
       }
-      .el-button{
+      .switchButton{
         top: 12px;
+        outline: 0;
+        color: #4a84ff;
         min-width: 72px;
+        cursor: pointer;
         padding: 4px 8px;
         position: absolute;
+        border-radius: 16px;
+        white-space: nowrap;
+        border: solid 1px #4a84ff;
         &:first-child{
-          left: 21px;
+          left: 20px;
         }
         &:last-child{
-          right: 21px;
+          right: 20px;
         }
       }
     }
     .content {
-      padding: 40px 0 20px 0;
       height: 340px;
+      padding: 40px 0 20px 0;
+      box-sizing: border-box;
       ul.week{
         height: 15px;
-        margin-bottom: 15px;
         display: flex;
+        margin-bottom: 15px;
         flex-wrap: wrap;
         padding: 0 19px;
         li{
@@ -140,6 +150,7 @@ export default {
           height: 15px;
           line-height: 15px;
           margin: 0 25px;
+          list-style: none;
           text-align: center;
         }
       }
