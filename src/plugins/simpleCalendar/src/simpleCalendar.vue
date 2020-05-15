@@ -175,7 +175,7 @@ export default {
 
 <style lang="less" scoped>
   .simpleCalendar {
-    width: 672px;
+    width: 100%;
     height: 380px;
     background-color: #ffffff;
     border-radius: 4px;
