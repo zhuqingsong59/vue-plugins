@@ -29,7 +29,10 @@
       <ul class="date">
         <li
           :key="index"
-          :class="{'is-currentMonth': item.currentMonth, 'is-selected': item.isSelected }"
+          :class="{'is-currentMonth': item.currentMonth,
+                  'is-selected': item.isSelected,
+                  'is-nextMonth': item.nextMonth,
+                  'is-preMonth': item.preMonth }"
           v-for="(item, index) in daysList"
           @click="selectDate(item)">
           <div class="show-date">
@@ -52,6 +55,11 @@ export default {
     }
   },
   props: {
+    // 日历初始月份
+    initDate: {
+      type: String,
+      default: ''
+    },
     // 上一月切换的disabled控制
     preDisabled: {
       type: Boolean,
@@ -62,10 +70,10 @@ export default {
       type: Boolean,
       default: false
     },
-    // 日历初始月份
-    initDate: {
-      type: String,
-      default: ''
+    // 日期选择单选，复选设置, 默认复选
+    isMultiple: {
+      type: Boolean,
+      default: true
     }
   },
   computed: {
@@ -123,8 +131,18 @@ export default {
     },
     selectDate (selectItem) {
       if (selectItem.currentMonth) {
-        selectItem.isSelected = !selectItem.isSelected
         let selectIndex = this.daysList.indexOf(selectItem)
+        if (!this.isMultiple) {
+          let isSelectedIndex = this.daysList.findIndex((item) => {
+            return item.isSelected
+          })
+          if (isSelectedIndex !== -1 && isSelectedIndex !== selectIndex) {
+            let selectedItem = this.daysList[isSelectedIndex]
+            selectedItem.isSelected = false
+            this.$set(this.daysList, isSelectedIndex, selectedItem)
+          }
+        }
+        selectItem.isSelected = !selectItem.isSelected
         this.$set(this.daysList, selectIndex, selectItem)
       }
     },
@@ -165,7 +183,7 @@ export default {
         margin: 0;
         height: 50px;
         color: #535353;
-        font-size: 14px;
+        font-size: 18px;
         font-weight: 500;
         line-height: 50px;
         text-align: center;
@@ -225,6 +243,7 @@ export default {
           .show-date {
             height: 32px;
             line-height: 32px;
+            border-radius: 4px;
           }
           &.is-currentMonth {
             .show-date{
@@ -232,6 +251,9 @@ export default {
               cursor: pointer;
               background-color: #edf2ff;
             }
+          }
+          &.is-nextMonth, &.is-preMonth {
+            color: #999999;
           }
           &.is-selected {
             .show-date{

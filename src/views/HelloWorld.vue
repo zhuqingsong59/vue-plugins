@@ -2,6 +2,7 @@
   <div class="hello">
     <simpleCalendar
       @currentMonth="currentMonth"
+      :is-multiple="false"
       ref="simpleCalendar">
     </simpleCalendar>
   </div>
