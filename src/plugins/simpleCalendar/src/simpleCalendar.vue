@@ -1,9 +1,20 @@
 <template>
   <div class="simpleCalendar">
     <div class="header">
-      <button class="switchButton" @click="pre" :disabled="monthPage < 0">上一月</button>
+      <button class="switchButton"
+        @click="pre"
+        :class="{'is-disabled': preDisabled}"
+        :disabled="preDisabled">
+        上一月
+      </button>
       <p>{{yearMonth}}</p>
-      <button class="switchButton" @click="next" :disabled="monthPage > 0">下一月</button>
+      <button
+        class="switchButton"
+        @click="next"
+        :class="{'is-disabled': nextDisabled}"
+        :disabled="nextDisabled">
+        下一月
+      </button>
     </div>
     <div class="content">
       <ul class="week">
@@ -16,8 +27,14 @@
         <li>六</li>
       </ul>
       <ul class="date">
-        <li :key="index" @click="selectDate(item)" v-for="(item, index) in list" :class="{'isValid': item.showDate, 'actived': item.active }">
-          {{item.showDate}}
+        <li
+          :key="index"
+          :class="{'is-currentMonth': item.currentMonth, 'is-selected': item.isSelected }"
+          v-for="(item, index) in daysList"
+          @click="selectDate(item)">
+          <div class="show-date">
+            {{item.showDate}}
+          </div>
         </li>
       </ul>
     </div>
@@ -25,68 +42,105 @@
 </template>
 
 <script>
+import dayjs from 'dayjs'
 export default {
   name: 'simpleCalendar',
   data () {
     return {
-      monthPage: 0,
       date: '',
-      list: []
+      daysList: []
+    }
+  },
+  props: {
+    // 上一月切换的disabled控制
+    preDisabled: {
+      type: Boolean,
+      default: false
+    },
+    // 下一月切换的disabled控制
+    nextDisabled: {
+      type: Boolean,
+      default: false
+    },
+    // 日历初始月份
+    initDate: {
+      type: String,
+      default: ''
+    }
+  },
+  computed: {
+    yearMonth () {
+      return dayjs(this.date).format('YYYY年MM月')
     }
   },
   created () {
-    this.date = this.$date.day().format('YYYY-MM')
-    this.init()
+    if (this.initDate) {
+      this.init(this.initDate)
+    } else {
+      this.init()
+    }
   },
   methods: {
-    resetList () {
-      this.date = this.$date.day().format('YYYY-MM')
-      this.monthPage = 0
-      this.init()
-    },
     init (setDate) {
-      let date = setDate || this.date
-      this.yearMonth = this.$date.day(date).format('YYYY年MM月')
+      this.date = (dayjs(setDate).format('YYYY') === 'Invalid Date') ? dayjs() : dayjs(setDate)
       // 当月总天数
-      let daysInMonth = this.$date.daysInMonth(date)
+      let daysInMonth = dayjs(this.date).daysInMonth()
       // 当月第一天
-      let startOfMonth = this.$date.startOfMonth(date)
-      // 周几
-      let formatd = this.$date.formatd(startOfMonth)
-      let list = []
-      for (let i = 1; i < Number(formatd) + 1; i++) {
-        list.push({
-          date: this.$date.addDayDate(startOfMonth, -i),
-          showDate: ''
+      let startDayOfMonth = dayjs(this.date).startOf('month')
+      // 当月第一天为周几；0:周日 1:周一 2:周二。。。。。
+      let startOfWeek = dayjs(startDayOfMonth).day()
+      // 当月最后一天
+      let endDayOfMonth = dayjs(this.date).endOf('month')
+      // 当月最后一天为周几；0:周日 1:周一 2:周二。。。。。
+      let endOfWeek = dayjs(endDayOfMonth).day()
+      // 日期列表
+      let daysList = []
+      // 上月日期补全
+      for (let i = Number(startOfWeek); i > 0; i--) {
+        daysList.push({
+          date: dayjs(startDayOfMonth).subtract(i, 'day').format('YYYY-MM-DD'),
+          showDate: dayjs(startDayOfMonth).subtract(i, 'day').format('DD'),
+          preMonth: true
         })
       }
+      // 当月日期
       for (let i = 0; i < daysInMonth; i++) {
-        list.push({
-          date: this.$date.addDayDate(startOfMonth, i),
-          showDate: i + 1
+        daysList.push({
+          date: dayjs(startDayOfMonth).add(i, 'day').format('YYYY-MM-DD'),
+          showDate: dayjs(startDayOfMonth).add(i, 'day').format('DD'),
+          currentMonth: true
         })
       }
-      this.list = list
+      // 下月日期补全
+      for (let i = 1; i < 7 - Number(endOfWeek); i++) {
+        daysList.push({
+          date: dayjs(endDayOfMonth).add(i, 'day').format('YYYY-MM-DD'),
+          showDate: dayjs(endDayOfMonth).add(i, 'day').format('DD'),
+          nextMonth: true
+        })
+      }
+      this.daysList = daysList
     },
-    selectDate (item) {
-      if (item.showDate) {
-        item.active = !item.active
-        this.list = this.api.copy(this.list)
+    selectDate (selectItem) {
+      if (selectItem.currentMonth) {
+        selectItem.isSelected = !selectItem.isSelected
+        let selectIndex = this.daysList.indexOf(selectItem)
+        this.$set(this.daysList, selectIndex, selectItem)
       }
     },
     next () {
-      this.monthPage += 1
-      this.date = this.$date.addDate(this.date, 1)
-      this.init()
+      let currentDate = dayjs(this.date).add(1, 'month')
+      this.init(currentDate)
+      this.$emit('currentMonth', dayjs(currentDate).format('YYYY-MM'))
     },
     pre () {
-      this.monthPage -= 1
-      this.date = this.$date.addDate(this.date, -1)
-      this.init()
+      let currentDate = dayjs(this.date).subtract(1, 'month')
+      this.init(currentDate)
+      this.$emit('currentMonth', dayjs(currentDate).format('YYYY-MM'))
     },
     getSelected () {
-      return this.list.filter((item) => {
-        return item.active
+      return this.daysList.filter((item) => {
+        return item.isSelected
       })
     }
   }
@@ -96,7 +150,7 @@ export default {
 <style lang="less" scoped>
   .simpleCalendar {
     width: 672px;
-    height: 391px;
+    height: 380px;
     background-color: #ffffff;
     border-radius: 4px;
     border: solid 1px #e9e9e9;
@@ -127,6 +181,9 @@ export default {
         border-radius: 16px;
         white-space: nowrap;
         border: solid 1px #4a84ff;
+        &.is-disabled {
+          cursor: not-allowed;
+        }
         &:first-child{
           left: 20px;
         }
@@ -136,20 +193,19 @@ export default {
       }
     }
     .content {
-      height: 340px;
-      padding: 40px 0 20px 0;
+      height: 330px;
+      padding: 20px 0;
       box-sizing: border-box;
       ul.week{
         height: 15px;
         display: flex;
         margin-bottom: 15px;
         flex-wrap: wrap;
-        padding: 0 19px;
+        padding: 0 20px;
         li{
-          width: 40px;
+          width: calc(100% / 7);
           height: 15px;
           line-height: 15px;
-          margin: 0 25px;
           list-style: none;
           text-align: center;
         }
@@ -157,21 +213,31 @@ export default {
       ul.date{
         display: flex;
         flex-wrap: wrap;
-        padding: 0 19px;
+        padding: 0 20px;
+        margin: 0;
         li{
-          width: 40px;
-          height: 32px;
-          cursor: pointer;
+          width: calc(100% / 7);
+          list-style: none;
+          height: 40px;
           text-align: center;
-          border-radius: 4px;
-          margin: 0 25px 10px 25px;
-          &.isValid {
-            background-color: #edf2ff;
-            color: #4a84ff;
+          padding: 4px;
+          box-sizing: border-box;
+          .show-date {
+            height: 32px;
+            line-height: 32px;
           }
-          &.actived {
-            background-color: #4a84ff;
-            color: #ffffff;
+          &.is-currentMonth {
+            .show-date{
+              color: #4a84ff;
+              cursor: pointer;
+              background-color: #edf2ff;
+            }
+          }
+          &.is-selected {
+            .show-date{
+              background-color: #4a84ff;
+              color: #ffffff;
+            }
           }
         }
       }

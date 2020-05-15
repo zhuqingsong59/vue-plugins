@@ -1,6 +1,9 @@
 <template>
   <div class="hello">
-    <simpleCalendar ref="simpleCalendar"></simpleCalendar>
+    <simpleCalendar
+      @currentMonth="currentMonth"
+      ref="simpleCalendar">
+    </simpleCalendar>
   </div>
 </template>
 
@@ -12,7 +15,14 @@ export default {
     simpleCalendar
   },
   data () {
-    return {}
+    return {
+      preDisabled: false
+    }
+  },
+  methods: {
+    currentMonth (data) {
+      console.log(data)
+    }
   }
 }
 </script>
