@@ -74,7 +74,17 @@ export default {
     isMultiple: {
       type: Boolean,
       default: true
+    },
+    selectedList: {
+      type: Array,
+      default: () => {
+        return []
+      }
     }
+  },
+  model: {
+    prop: 'selectedList',
+    event: 'getSelected'
   },
   computed: {
     yearMonth () {
@@ -136,7 +146,7 @@ export default {
           let isSelectedIndex = this.daysList.findIndex((item) => {
             return item.isSelected
           })
-          if (isSelectedIndex !== -1 && isSelectedIndex !== selectIndex) {
+          if (isSelectedIndex !== -1) {
             let selectedItem = this.daysList[isSelectedIndex]
             selectedItem.isSelected = false
             this.$set(this.daysList, isSelectedIndex, selectedItem)
@@ -144,6 +154,9 @@ export default {
         }
         selectItem.isSelected = !selectItem.isSelected
         this.$set(this.daysList, selectIndex, selectItem)
+        this.$emit('getSelected', this.daysList.filter((item) => {
+          return item.isSelected
+        }))
       }
     },
     next () {
@@ -155,11 +168,6 @@ export default {
       let currentDate = dayjs(this.date).subtract(1, 'month')
       this.init(currentDate)
       this.$emit('currentMonth', dayjs(currentDate).format('YYYY-MM'))
-    },
-    getSelected () {
-      return this.daysList.filter((item) => {
-        return item.isSelected
-      })
     }
   }
 }

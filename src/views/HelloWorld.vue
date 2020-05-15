@@ -2,7 +2,7 @@
   <div class="hello">
     <simpleCalendar
       @currentMonth="currentMonth"
-      :is-multiple="false"
+      v-model="list"
       ref="simpleCalendar">
     </simpleCalendar>
   </div>
@@ -17,12 +17,16 @@ export default {
   },
   data () {
     return {
-      preDisabled: false
+      preDisabled: false,
+      list: []
     }
   },
   methods: {
     currentMonth (data) {
       console.log(data)
+    },
+    test () {
+      console.log(this.list)
     }
   }
 }
