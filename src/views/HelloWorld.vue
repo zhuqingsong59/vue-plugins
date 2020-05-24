@@ -9,12 +9,8 @@
 </template>
 
 <script>
-import simpleCalendar from '@/plugins/simpleCalendar/src/simpleCalendar'
 export default {
   name: 'HelloWorld',
-  components: {
-    simpleCalendar
-  },
   data () {
     return {
       preDisabled: false,
