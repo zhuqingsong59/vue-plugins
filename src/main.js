@@ -3,10 +3,10 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-// import simpleCalendar from '@/dist'
-import simpleCalendar from 'simple-calendar-vue'
+import simpleCalendarVue from 'simple-calendar-vue'
+console.log(simpleCalendarVue)
 Vue.config.productionTip = false
-Vue.use(simpleCalendar)
+Vue.use(simpleCalendarVue)
 
 /* eslint-disable no-new */
 new Vue({
