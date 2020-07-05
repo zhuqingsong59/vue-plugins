@@ -17,6 +17,11 @@ export default {
       list: []
     }
   },
+  watch: {
+    list (newVal) {
+      console.log(newVal)
+    }
+  },
   methods: {
     currentMonth (data) {
       console.log(data)

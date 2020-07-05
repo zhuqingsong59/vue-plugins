@@ -12,9 +12,10 @@
   },
   "dependencies": {
     "dayjs": "^1.8.26",
-    "simple-calendar-vue": "0.0.5",
+    "simple-calendar-vue": "^1.0.3",
     "vue": "^2.5.2",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "webdata2excel": "0.0.9"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
